@@ -1,0 +1,812 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Michael Rantseli | Official Booking Portal</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              black: '#090A0F',
+              card: '#12151E',
+              border: '#212738',
+              gold: '#F59E0B',
+              goldGlow: '#FBBF24',
+              cyan: '#06B6D4',
+              cyanGlow: '#22D3EE',
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          boxShadow: {
+            'glow-gold': '0 0 20px -3px rgba(245, 158, 11, 0.35)',
+            'glow-cyan': '0 0 20px -3px rgba(6, 182, 212, 0.35)',
+            'glow-card': '0 10px 30px -10px rgba(0, 0, 0, 0.7)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #090A0F;
+      color: #F3F4F6;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090A0F;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #212738;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #F59E0B;
+    }
+
+    .glow-border-gold {
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      transition: all 0.3s ease;
+    }
+    .glow-border-gold:hover, .glow-border-gold.active {
+      border-color: #F59E0B;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+    }
+
+    .glow-border-cyan {
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      transition: all 0.3s ease;
+    }
+    .glow-border-cyan:hover, .glow-border-cyan.active {
+      border-color: #06B6D4;
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+    }
+
+    .glass-card {
+      background: rgba(18, 21, 30, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      opacity: 0.7;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between pb-20 md:pb-6 antialiased selection:bg-amber-500 selection:text-black">
+
+  <!-- Header / Profile Branding -->
+  <header class="sticky top-0 z-40 glass-card border-b border-gray-800/80 px-4 py-3">
+    <div class="max-w-3xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-500/80 shadow-glow-gold flex items-center justify-center bg-gray-900">
+            <i class="fa-solid fa-microphone-lines text-2xl text-amber-400"></i>
+          </div>
+          <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-brand-black rounded-full" title="Available for bookings"></span>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-base sm:text-lg tracking-tight bg-gradient-to-r from-amber-400 via-yellow-200 to-cyan-400 bg-clip-text text-transparent">
+            MICHAEL RANTSELI
+          </h1>
+          <p class="text-xs text-gray-400 font-medium flex items-center gap-1">
+            <span>Solo Artist</span> • <span>Full Band</span> • <span>Vocal Coach</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Action Navigation -->
+      <div class="flex items-center gap-2">
+        <button id="nav-booking-btn" onclick="switchTab('booking')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 transition flex items-center gap-1.5 active">
+          <i class="fa-solid fa-calendar-plus"></i>
+          <span class="hidden sm:inline">Book Now</span>
+        </button>
+        <button id="nav-history-btn" onclick="switchTab('history')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-gray-800/80 text-gray-300 border border-gray-700 hover:bg-gray-700 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-receipt"></i>
+          <span class="hidden sm:inline">My Requests</span>
+          <span id="history-badge" class="bg-amber-500 text-black text-[10px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-3xl w-full mx-auto px-4 py-6 flex-grow">
+    
+    <!-- SECTION 1: BOOKING TAB -->
+    <div id="tab-booking" class="space-y-6">
+
+      <!-- Hero Banner / Quick Intro -->
+      <div class="relative overflow-hidden rounded-2xl p-5 glass-card border border-amber-500/20 shadow-glow-card">
+        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-10 -top-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <span class="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/30 mb-2">
+              Official Booking Hub
+            </span>
+            <h2 class="text-xl sm:text-2xl font-bold text-white">Reserve Your Session or Performance</h2>
+            <p class="text-xs sm:text-sm text-gray-400 mt-1 max-w-md">
+              Select solo vocals, full live band ensemble, 1-on-1 coaching, or vocal studio production.
+            </p>
+          </div>
+          <div class="bg-brand-black/60 px-3 py-2 rounded-xl border border-gray-800 flex items-center gap-2 self-stretch sm:self-auto justify-center text-center">
+            <i class="fa-brands fa-whatsapp text-emerald-400 text-lg"></i>
+            <span class="text-xs text-gray-300 font-medium">Direct WhatsApp: 064 801 5189</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step Indicator -->
+      <div class="grid grid-cols-3 gap-2 text-center text-xs font-semibold">
+        <div id="step-pill-1" class="py-2 px-1 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center gap-1.5 transition">
+          <span class="w-5 h-5 rounded-full bg-amber-500 text-black text-[11px] font-bold flex items-center justify-center">1</span>
+          <span class="truncate">Select Services</span>
+        </div>
+        <div id="step-pill-2" class="py-2 px-1 rounded-xl bg-gray-800/60 text-gray-400 border border-gray-800 flex items-center justify-center gap-1.5 transition">
+          <span class="w-5 h-5 rounded-full bg-gray-700 text-gray-300 text-[11px] font-bold flex items-center justify-center">2</span>
+          <span class="truncate">Logistics & Date</span>
+        </div>
+        <div id="step-pill-3" class="py-2 px-1 rounded-xl bg-gray-800/60 text-gray-400 border border-gray-800 flex items-center justify-center gap-1.5 transition">
+          <span class="w-5 h-5 rounded-full bg-gray-700 text-gray-300 text-[11px] font-bold flex items-center justify-center">3</span>
+          <span class="truncate">Send Details</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: SERVICE CATALOG & SELECTION -->
+      <section class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-amber-400"></i>
+            1. Select Booking Options
+            <span class="text-xs font-normal text-gray-400">(Multi-select enabled)</span>
+          </h3>
+          <span class="text-xs text-amber-400 font-medium" id="selected-count-label">0 Selected</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="service-catalog">
+          
+          <!-- Card 1: Solo Performance -->
+          <div class="service-card glass-card rounded-2xl p-4 cursor-pointer relative transition-all duration-200 border border-gray-800 hover:border-amber-500/50" data-id="solo" data-price="5000" data-name="Solo Performance (Vocals Only)" data-duration="2">
+            <div class="flex justify-between items-start mb-2">
+              <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                <i class="fa-solid fa-microphone text-lg"></i>
+              </div>
+              <input type="checkbox" class="service-checkbox w-5 h-5 rounded text-amber-500 focus:ring-amber-500 bg-gray-900 border-gray-700 pointer-events-none" />
+            </div>
+            <h4 class="font-bold text-sm text-white">Solo Performance (Vocals Only)</h4>
+            <p class="text-xs text-gray-400 mt-1 line-clamp-2">Michael Rantseli solo performance (stems / backing track). Ideal for guest features & vocal appearances.</p>
+            <div class="mt-3 pt-2 border-t border-gray-800/60 flex items-center justify-between text-xs">
+              <span class="text-gray-400"><i class="fa-regular fa-clock mr-1"></i>Excl. Transport</span>
+              <span class="font-extrabold text-amber-400">R5,000 <span class="text-[10px] text-gray-400 font-normal">base fee</span></span>
+            </div>
+          </div>
+
+          <!-- Card 2: Full Live Band & Vocals -->
+          <div class="service-card glass-card rounded-2xl p-4 cursor-pointer relative transition-all duration-200 border border-gray-800 hover:border-amber-500/50" data-id="band" data-price="15000" data-name="Full Live Band & Vocals" data-duration="3">
+            <div class="flex justify-between items-start mb-2">
+              <div class="w-10 h-10 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-400">
+                <i class="fa-solid fa-drum text-lg"></i>
+              </div>
+              <input type="checkbox" class="service-checkbox w-5 h-5 rounded text-yellow-500 focus:ring-yellow-500 bg-gray-900 border-gray-700 pointer-events-none" />
+            </div>
+            <h4 class="font-bold text-sm text-white">Full Live Band & Vocals</h4>
+            <p class="text-xs text-gray-400 mt-1 line-clamp-2">Complete live musical package with professional backing band and backing vocalists for concerts & major events.</p>
+            <div class="mt-3 pt-2 border-t border-gray-800/60 flex items-center justify-between text-xs">
+              <span class="text-gray-400"><i class="fa-regular fa-clock mr-1"></i>Excl. Transport</span>
+              <span class="font-extrabold text-yellow-400">R15,000 <span class="text-[10px] text-gray-400 font-normal">base fee</span></span>
+            </div>
+          </div>
+
+          <!-- Card 3: Vocal Coaching -->
+          <div class="service-card glass-card rounded-2xl p-4 cursor-pointer relative transition-all duration-200 border border-gray-800 hover:border-cyan-500/50" data-id="coach" data-price="800" data-name="Vocal Coaching & Training" data-duration="1">
+            <div class="flex justify-between items-start mb-2">
+              <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <i class="fa-solid fa-microphone-vocal text-lg"></i>
+              </div>
+              <input type="checkbox" class="service-checkbox w-5 h-5 rounded text-cyan-500 focus:ring-cyan-500 bg-gray-900 border-gray-700 pointer-events-none" />
+            </div>
+            <h4 class="font-bold text-sm text-white">Vocal Coaching & Training</h4>
+            <p class="text-xs text-gray-400 mt-1 line-clamp-2">1-on-1 Voice Lessons, vocal range expansion, pitch control, stamina, and group choir coaching.</p>
+            <div class="mt-3 pt-2 border-t border-gray-800/60 flex items-center justify-between text-xs">
+              <span class="text-gray-400"><i class="fa-regular fa-clock mr-1"></i>1 Hour Session</span>
+              <span class="font-extrabold text-cyan-400">R800 <span class="text-[10px] text-gray-400 font-normal">/ hour</span></span>
+            </div>
+          </div>
+
+          <!-- Card 4: Vocal Production & Directing -->
+          <div class="service-card glass-card rounded-2xl p-4 cursor-pointer relative transition-all duration-200 border border-gray-800 hover:border-purple-500/50" data-id="prod" data-price="2500" data-name="Vocal Production & Studio Directing" data-duration="3">
+            <div class="flex justify-between items-start mb-2">
+              <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                <i class="fa-solid fa-sliders text-lg"></i>
+              </div>
+              <input type="checkbox" class="service-checkbox w-5 h-5 rounded text-purple-500 focus:ring-purple-500 bg-gray-900 border-gray-700 pointer-events-none" />
+            </div>
+            <h4 class="font-bold text-sm text-white">Vocal Production & Studio Directing</h4>
+            <p class="text-xs text-gray-400 mt-1 line-clamp-2">Vocal arrangements, harmony layering, live studio directing, vocal tuning, and stem preparation.</p>
+            <div class="mt-3 pt-2 border-t border-gray-800/60 flex items-center justify-between text-xs">
+              <span class="text-gray-400"><i class="fa-regular fa-clock mr-1"></i>Per Track / Session</span>
+              <span class="font-extrabold text-purple-400">R2,500 <span class="text-[10px] text-gray-400 font-normal">/ track</span></span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- STEP 2: LOGISTICS & ADD-ONS -->
+      <section class="glass-card rounded-2xl p-4 sm:p-5 border border-gray-800 space-y-4">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-truck-plane text-cyan-400"></i>
+          2. Event Logistics & Tech Add-ons
+        </h3>
+
+        <!-- Add-on Toggles -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label class="flex items-center justify-between p-3 rounded-xl bg-brand-black/60 border border-gray-800 cursor-pointer hover:border-gray-700 transition">
+            <div class="flex items-center gap-2.5">
+              <i class="fa-solid fa-volume-high text-amber-400 text-sm"></i>
+              <div>
+                <span class="text-xs font-bold text-white block">Need Sound System / PA?</span>
+                <span class="text-[10px] text-gray-400">Added to request for quote</span>
+              </div>
+            </div>
+            <input type="checkbox" id="addon-sound" class="w-4 h-4 rounded text-amber-500 bg-gray-900 border-gray-700" onchange="calculateTotals()">
+          </label>
+
+          <label class="flex items-center justify-between p-3 rounded-xl bg-brand-black/60 border border-gray-800 cursor-pointer hover:border-gray-700 transition">
+            <div class="flex items-center gap-2.5">
+              <i class="fa-solid fa-car text-cyan-400 text-sm"></i>
+              <div>
+                <span class="text-xs font-bold text-white block">Out-of-Town Transport Required?</span>
+                <span class="text-[10px] text-gray-400">Travel fee arranged separately</span>
+              </div>
+            </div>
+            <input type="checkbox" id="addon-transport" class="w-4 h-4 rounded text-cyan-500 bg-gray-900 border-gray-700" onchange="calculateTotals()">
+          </label>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+          <!-- Date Selection -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Event / Session Date</label>
+            <input type="date" id="booking-date" class="w-full bg-brand-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition" />
+          </div>
+
+          <!-- Time Slot Selection -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Preferred Time Slot</label>
+            <select id="booking-time" class="w-full bg-brand-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+              <option value="">-- Select Time Slot --</option>
+              <option value="09:00 AM">09:00 AM (Morning Session)</option>
+              <option value="12:00 PM">12:00 PM (Mid-Day)</option>
+              <option value="03:00 PM">03:00 PM (Afternoon)</option>
+              <option value="06:00 PM">06:00 PM (Evening)</option>
+              <option value="08:00 PM">08:00 PM (Late Night Show)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 3: CLIENT DETAILS & EVENT NOTES -->
+      <section class="glass-card rounded-2xl p-4 sm:p-5 border border-gray-800 space-y-4">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-user-pen text-amber-400"></i>
+          3. Client Information & Session Details
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Full Name -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Your Name / Event Organizer *</label>
+            <input type="text" id="client-name" placeholder="e.g. Sipho Nkosi" class="w-full bg-brand-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition" />
+          </div>
+
+          <!-- Phone / WhatsApp -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">WhatsApp / Phone Number *</label>
+            <div class="flex">
+              <span class="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-gray-700 bg-gray-800 text-gray-400 text-xs font-bold">
+                +27
+              </span>
+              <input type="tel" id="client-phone" placeholder="82 123 4567 or 064..." class="w-full bg-brand-black border border-gray-700 rounded-r-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition" />
+            </div>
+          </div>
+
+          <!-- Location / Venue -->
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Venue / Location / City</label>
+            <input type="text" id="client-venue" placeholder="e.g. Pretoria North, State Theatre, Studio in Randburg..." class="w-full bg-brand-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition" />
+          </div>
+
+          <!-- Specific Requirements -->
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Event Notes & Song Details</label>
+            <textarea id="client-notes" rows="3" placeholder="Specify song keys, set duration, choir requirements, or special event requests..." class="w-full bg-brand-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition resize-none"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- TERMS, DISCLAIMERS & NEGOTIABLE SMALL PRINT -->
+      <section class="glass-card rounded-2xl p-4 sm:p-5 border border-amber-500/20 bg-amber-500/5 space-y-3 text-xs text-gray-300">
+        <h4 class="font-bold text-amber-400 flex items-center gap-2">
+          <i class="fa-solid fa-circle-info"></i> Official Booking Terms & Conditions
+        </h4>
+        <ul class="space-y-2 list-disc list-inside text-gray-300 text-[11px] leading-relaxed">
+          <li><strong>Transport Excluded:</strong> Performance base rates exclude out-of-town travel and logistics costs.</li>
+          <li><strong>Sound System:</strong> Michael Rantseli is not directly responsible for booking sound or providing technical PA equipment. Sound arrangements can be coordinated upon request for additional technical fees.</li>
+          <li><strong>Marketing & Promotion:</strong> Michael is not directly responsible for marketing or promoting booked events. While courtesy posts will be made on social media, official event advertising remains the organizer's responsibility.</li>
+          <li class="text-amber-300 font-medium"><strong>Negotiable Terms:</strong> <em>"Prices are open to negotiation if event terms, duration, or travel arrangements are favorable. I love music and sharing it with the world, while remaining realistic about production expenses and quality standards."</em></li>
+        </ul>
+      </section>
+
+      <!-- STEP 4: PRICE ESTIMATE & WHATSAPP ACTION -->
+      <section class="glass-card rounded-2xl p-5 border-2 border-amber-500/40 shadow-glow-gold relative overflow-hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-800 pb-4">
+          <div>
+            <span class="text-xs uppercase tracking-wider text-gray-400 font-bold">Estimated Base Total</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span id="total-price-display" class="text-3xl font-extrabold text-amber-400">R0</span>
+              <span class="text-xs text-gray-400">(Excl. transport)</span>
+            </div>
+          </div>
+          <div id="service-summary-pills" class="flex flex-wrap gap-1.5 max-w-xs">
+            <span class="text-xs text-gray-500 italic">No services selected yet</span>
+          </div>
+        </div>
+
+        <div class="mt-4 space-y-3">
+          <button onclick="sendWhatsAppBooking()" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-sm sm:text-base tracking-wide shadow-lg shadow-emerald-900/40 transition-all transform active:scale-[0.99] flex items-center justify-center gap-2">
+            <i class="fa-brands fa-whatsapp text-xl"></i>
+            <span>SEND BOOKING REQUEST VIA WHATSAPP</span>
+          </button>
+          
+          <div class="flex items-center justify-between text-[11px] text-gray-400 px-1">
+            <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-amber-400"></i> Direct Line to Michael</span>
+            <span>WhatsApp: <strong>064 801 5189</strong></span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- SECTION 2: SAVED REQUESTS HISTORY TAB -->
+    <div id="tab-history" class="hidden space-y-4">
+      <div class="flex items-center justify-between glass-card p-4 rounded-2xl border border-gray-800">
+        <div>
+          <h2 class="text-lg font-bold text-white">Saved Booking Requests</h2>
+          <p class="text-xs text-gray-400">Stored locally on your device for quick tracking.</p>
+        </div>
+        <button onclick="clearHistory()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 transition">
+          <i class="fa-solid fa-trash-can mr-1"></i> Clear All
+        </button>
+      </div>
+
+      <div id="history-container" class="space-y-3">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer Info -->
+  <footer class="max-w-3xl mx-auto px-4 py-4 text-center text-xs text-gray-500 border-t border-gray-900 mt-6">
+    <p>© 2026 Michael Rantseli Music & Vocal Production. All rights reserved.</p>
+    <p class="mt-1 text-[11px] text-gray-600">Built for high performance • Zero backend operational cost</p>
+  </footer>
+
+  <!-- Notification Toast Modal -->
+  <div id="toast-message" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-amber-500 text-black font-bold text-xs shadow-2xl transition-all duration-300 opacity-0 pointer-events-none translate-y-4 flex items-center gap-2">
+    <i class="fa-solid fa-circle-info"></i>
+    <span id="toast-text">Notification message</span>
+  </div>
+
+  <script>
+    // Application State
+    const state = {
+      selectedServices: [],
+      date: '',
+      timeSlot: '',
+      clientName: '',
+      clientPhone: '',
+      clientVenue: '',
+      clientNotes: '',
+      soundRequired: false,
+      transportRequired: false,
+      totalPrice: 0,
+      targetNumber: '27648015189' // South Africa format for 064 801 5189
+    };
+
+    // DOM Elements
+    const serviceCards = document.querySelectorAll('.service-card');
+    const dateInput = document.getElementById('booking-date');
+    const timeSelect = document.getElementById('booking-time');
+    const nameInput = document.getElementById('client-name');
+    const phoneInput = document.getElementById('client-phone');
+    const venueInput = document.getElementById('client-venue');
+    const notesInput = document.getElementById('client-notes');
+    const totalPriceDisplay = document.getElementById('total-price-display');
+    const serviceSummaryPills = document.getElementById('service-summary-pills');
+    const selectedCountLabel = document.getElementById('selected-count-label');
+
+    // Set Min Date to Today
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+    dateInput.value = today;
+    state.date = today;
+
+    // Initialize Event Listeners
+    window.addEventListener('DOMContentLoaded', () => {
+      initServiceSelection();
+      initFormListeners();
+      loadHistoryBadge();
+      updateStepPills();
+    });
+
+    // Handle Tab Switching
+    function switchTab(tab) {
+      const bookingTab = document.getElementById('tab-booking');
+      const historyTab = document.getElementById('tab-history');
+      const navBookingBtn = document.getElementById('nav-booking-btn');
+      const navHistoryBtn = document.getElementById('nav-history-btn');
+
+      if (tab === 'booking') {
+        bookingTab.classList.remove('hidden');
+        historyTab.classList.add('hidden');
+        navBookingBtn.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30 transition flex items-center gap-1.5 active";
+        navHistoryBtn.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-gray-800/80 text-gray-300 border border-gray-700 hover:bg-gray-700 transition flex items-center gap-1.5";
+      } else {
+        bookingTab.classList.add('hidden');
+        historyTab.classList.remove('hidden');
+        navHistoryBtn.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30 transition flex items-center gap-1.5 active";
+        navBookingBtn.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-gray-800/80 text-gray-300 border border-gray-700 hover:bg-gray-700 transition flex items-center gap-1.5";
+        renderHistory();
+      }
+    }
+
+    // Toggle Service Select Cards
+    function initServiceSelection() {
+      serviceCards.forEach(card => {
+        card.addEventListener('click', () => {
+          const id = card.dataset.id;
+          const name = card.dataset.name;
+          const price = parseFloat(card.dataset.price);
+          const checkbox = card.querySelector('.service-checkbox');
+
+          const existingIndex = state.selectedServices.findIndex(s => s.id === id);
+
+          if (existingIndex > -1) {
+            state.selectedServices.splice(existingIndex, 1);
+            card.classList.remove('glow-border-gold', 'glow-border-cyan', 'active');
+            card.style.borderColor = 'rgba(33, 39, 56, 1)';
+            checkbox.checked = false;
+          } else {
+            state.selectedServices.push({ id, name, price });
+            checkbox.checked = true;
+            if(id === 'coach') {
+              card.classList.add('glow-border-cyan', 'active');
+            } else {
+              card.classList.add('glow-border-gold', 'active');
+            }
+          }
+
+          calculateTotals();
+          updateStepPills();
+        });
+      });
+    }
+
+    // Bind inputs to state
+    function initFormListeners() {
+      dateInput.addEventListener('change', (e) => {
+        state.date = e.target.value;
+        updateStepPills();
+      });
+
+      timeSelect.addEventListener('change', (e) => {
+        state.timeSlot = e.target.value;
+        updateStepPills();
+      });
+
+      nameInput.addEventListener('input', (e) => state.clientName = e.target.value);
+      phoneInput.addEventListener('input', (e) => state.clientPhone = e.target.value);
+      venueInput.addEventListener('input', (e) => state.clientVenue = e.target.value);
+      notesInput.addEventListener('input', (e) => state.clientNotes = e.target.value);
+    }
+
+    // Recalculate Price and Hours
+    function calculateTotals() {
+      state.soundRequired = document.getElementById('addon-sound').checked;
+      state.transportRequired = document.getElementById('addon-transport').checked;
+
+      state.totalPrice = state.selectedServices.reduce((sum, s) => sum + s.price, 0);
+
+      // Render Price
+      totalPriceDisplay.textContent = `R${state.totalPrice.toLocaleString()}`;
+
+      // Selected count text
+      selectedCountLabel.textContent = `${state.selectedServices.length} Selected`;
+
+      // Render Service Pills Summary
+      if (state.selectedServices.length === 0) {
+        serviceSummaryPills.innerHTML = `<span class="text-xs text-gray-500 italic">No services selected yet</span>`;
+      } else {
+        let pillsHtml = state.selectedServices.map(s => 
+          `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">${s.name}</span>`
+        ).join('');
+
+        if (state.soundRequired) {
+          pillsHtml += `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">+ PA Sound Req</span>`;
+        }
+        if (state.transportRequired) {
+          pillsHtml += `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/30">+ Out-of-Town Travel</span>`;
+        }
+
+        serviceSummaryPills.innerHTML = pillsHtml;
+      }
+    }
+
+    // Progress Pill visual cue
+    function updateStepPills() {
+      const step1 = document.getElementById('step-pill-1');
+      const step2 = document.getElementById('step-pill-2');
+
+      if (state.selectedServices.length > 0) {
+        step1.className = "py-2 px-1 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center gap-1.5 transition";
+      } else {
+        step1.className = "py-2 px-1 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center gap-1.5 transition";
+      }
+
+      if (state.date && state.timeSlot) {
+        step2.className = "py-2 px-1 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center gap-1.5 transition";
+      } else {
+        step2.className = "py-2 px-1 rounded-xl bg-gray-800/60 text-gray-400 border border-gray-800 flex items-center justify-center gap-1.5 transition";
+      }
+    }
+
+    // Toast Notification helper
+    function showToast(msg) {
+      const toast = document.getElementById('toast-message');
+      const toastText = document.getElementById('toast-text');
+      toastText.textContent = msg;
+      
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+      }, 3000);
+    }
+
+    // Form Validation & WhatsApp Dispatch
+    function sendWhatsAppBooking() {
+      if (state.selectedServices.length === 0) {
+        showToast('Please select at least one performance/coaching option.');
+        return;
+      }
+
+      if (!state.date) {
+        showToast('Please select an event date.');
+        return;
+      }
+
+      if (!state.timeSlot) {
+        showToast('Please select a preferred time slot.');
+        return;
+      }
+
+      if (!nameInput.value.trim()) {
+        showToast('Please enter your full name or company.');
+        nameInput.focus();
+        return;
+      }
+
+      if (!phoneInput.value.trim()) {
+        showToast('Please enter your WhatsApp contact number.');
+        phoneInput.focus();
+        return;
+      }
+
+      const clientPhoneFormatted = '+27 ' + phoneInput.value.trim();
+      const serviceListText = state.selectedServices.map(s => `• ${s.name} (R${s.price.toLocaleString()})`).join('\n');
+
+      // Format WhatsApp Message
+      const message = 
+`🎵 *NEW BOOKING REQUEST - MICHAEL RANTSELI* 🎵
+
+👤 *Client/Organizer:* ${nameInput.value.trim()}
+📞 *Phone/WhatsApp:* ${clientPhoneFormatted}
+📍 *Venue/City:* ${venueInput.value.trim() || 'Not specified'}
+
+📅 *Date:* ${state.date}
+⏰ *Time Slot:* ${state.timeSlot}
+
+🛠 *Selected Option(s):*
+${serviceListText}
+
+🔊 *PA Sound Assistance Required?* ${state.soundRequired ? 'YES (Quote Needed)' : 'NO (Organizer Providing Sound)'}
+🚗 *Out-of-Town Transport Needed?* ${state.transportRequired ? 'YES' : 'NO'}
+
+💰 *Estimated Base Fee:* R${state.totalPrice.toLocaleString()} (Excl. transport)
+
+📝 *Notes / Event Requirements:*
+${notesInput.value.trim() || 'None provided.'}
+
+---
+_Sent via Michael Rantseli Official Booking Portal_`;
+
+      // Save Request to LocalStorage History
+      const requestRecord = {
+        id: 'MR-' + Date.now().toString().slice(-6),
+        timestamp: new Date().toLocaleString(),
+        name: nameInput.value.trim(),
+        phone: clientPhoneFormatted,
+        venue: venueInput.value.trim(),
+        date: state.date,
+        time: state.timeSlot,
+        services: state.selectedServices.map(s => s.name),
+        total: state.totalPrice,
+        sound: state.soundRequired,
+        transport: state.transportRequired,
+        notes: notesInput.value.trim()
+      };
+
+      saveBookingToHistory(requestRecord);
+
+      // Launch WhatsApp Direct URL
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/${state.targetNumber}?text=${encodedMessage}`;
+
+      showToast('Opening WhatsApp to send request...');
+      
+      setTimeout(() => {
+        window.open(whatsappUrl, '_blank');
+      }, 500);
+    }
+
+    // LocalStorage Operations
+    function saveBookingToHistory(record) {
+      let history = JSON.parse(localStorage.getItem('mr_bookings') || '[]');
+      history.unshift(record);
+      localStorage.setItem('mr_bookings', JSON.stringify(history));
+      loadHistoryBadge();
+    }
+
+    function loadHistoryBadge() {
+      let history = JSON.parse(localStorage.getItem('mr_bookings') || '[]');
+      const badge = document.getElementById('history-badge');
+      if (history.length > 0) {
+        badge.textContent = history.length;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    function renderHistory() {
+      const container = document.getElementById('history-container');
+      let history = JSON.parse(localStorage.getItem('mr_bookings') || '[]');
+
+      if (history.length === 0) {
+        container.innerHTML = `
+          <div class="glass-card p-8 rounded-2xl border border-gray-800 text-center">
+            <i class="fa-solid fa-folder-open text-3xl text-gray-600 mb-2"></i>
+            <p class="text-sm text-gray-400">No booking requests saved on this device yet.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = history.map(item => `
+        <div class="glass-card p-4 rounded-2xl border border-gray-800 space-y-2 relative">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                ${item.id}
+              </span>
+              <h4 class="font-bold text-sm text-white mt-1">${item.name}</h4>
+              <p class="text-xs text-gray-400">${item.phone} • ${item.venue || 'No Venue Specified'}</p>
+            </div>
+            <span class="text-base font-extrabold text-emerald-400">R${item.total.toLocaleString()}</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs bg-brand-black/60 p-2.5 rounded-xl border border-gray-800/80">
+            <div>
+              <span class="text-gray-500 text-[10px] block">DATE & TIME</span>
+              <span class="text-gray-200 font-medium">${item.date} @ ${item.time}</span>
+            </div>
+            <div>
+              <span class="text-gray-500 text-[10px] block">SERVICES</span>
+              <span class="text-gray-200 font-medium truncate block">${item.services.join(', ')}</span>
+            </div>
+          </div>
+
+          ${item.notes ? `<p class="text-xs text-gray-400 italic bg-gray-900/40 p-2 rounded-lg border border-gray-800/50">"${item.notes}"</p>` : ''}
+
+          <div class="flex justify-between items-center text-[10px] text-gray-500 pt-1">
+            <span>Requested: ${item.timestamp}</span>
+            <button onclick="resendWhatsAppHistory('${item.id}')" class="text-amber-400 font-bold hover:underline flex items-center gap-1">
+              <i class="fa-brands fa-whatsapp text-xs"></i> Resend Request
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function resendWhatsAppHistory(id) {
+      let history = JSON.parse(localStorage.getItem('mr_bookings') || '[]');
+      const item = history.find(h => h.id === id);
+      if (!item) return;
+
+      const serviceListText = item.services.map(s => `• ${s}`).join('\n');
+      const message = 
+`🎵 *RESENDING BOOKING REQUEST - MICHAEL RANTSELI* 🎵
+
+👤 *Client:* ${item.name}
+📞 *Phone/WhatsApp:* ${item.phone}
+📍 *Venue/City:* ${item.venue || 'N/A'}
+
+📅 *Date:* ${item.date}
+⏰ *Time Slot:* ${item.time}
+
+🛠 *Services:*
+${serviceListText}
+
+🔊 *Sound System Assistance Needed:* ${item.sound ? 'YES' : 'NO'}
+🚗 *Out-of-Town Transport Needed:* ${item.transport ? 'YES' : 'NO'}
+
+💰 *Base Price:* R${item.total.toLocaleString()} (Excl. transport)
+
+📝 *Notes:*
+${item.notes || 'N/A'}
+
+---
+_Reference ID: ${item.id}_`;
+
+      const encodedMessage = encodeURIComponent(message);
+      window.open(`https://wa.me/${state.targetNumber}?text=${encodedMessage}`, '_blank');
+    }
+
+    function clearHistory() {
+      if (confirm('Are you sure you want to clear your local booking history?')) {
+        localStorage.removeItem('mr_bookings');
+        renderHistory();
+        loadHistoryBadge();
+        showToast('Booking history cleared.');
+      }
+    }
+  </script>
+</body>
+</html>
+```
